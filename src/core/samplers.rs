@@ -4,8 +4,9 @@ use core::Distribution;
 use Float;
 
 #[inline]
-pub fn RejectionSampleRegion<D>(dist:&D, f:&Fn(&D::T)->bool)-> D::T
-    where D:Distribution
+pub fn RejectionSampleRegion<D,F>(dist:&D, f:F)-> D::T
+    where D:Distribution,
+    F:Fn(&D::T)->bool
     {
       let mut x=dist.sample(&mut rand::thread_rng());
         while !f(&x){

@@ -2,12 +2,15 @@ extern crate ml2;
 extern crate nalgebra as na;
 use na::{U2, U3, Dynamic, MatrixArray, MatrixVec,SVD};
 use na::Real;
+use std::f64::consts;
 
-extern crate rand;
-use rand::Rng;
+
+
 
 
 fn main(){
+
+    //ml2::tests::performance_tests::ProfileSamplers();
 
 }
 
