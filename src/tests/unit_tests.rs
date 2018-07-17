@@ -131,6 +131,55 @@ pub fn ImportanceSampleExponential(){
 
     let x=core::integrators::MultipleImportanceSampling(&q,&n,&f);
    // let x=core::integrators::MultipleImportanceSamplingSingleCore(&q,&n,&f);
-    println!("Result: {:?}",x);
+   // println!("Result: {:?}",x);
+
+}
+
+
+#[allow(non_snake_case)]
+#[test]
+pub fn MetropolisSampling(){
+    enum Distributions {
+        Normal,
+        Uniform
+    }
+//HIER SIND PROBLEME
+    impl Distribution for Distributions{
+        type T=[Float;1];
+        fn sample<'a,R:Rng+?Sized>(&'a self, rng:&mut R)->Self::T{
+            match self{
+                Distributions::Normal=>[SmallRng::from_entropy().sample(StandardNormal)],
+                Distributions::Uniform=>[4.0*rng.gen::<f64>()-2 as Float]
+            } 
+        }
+    }
+    impl PDF for Distributions{
+        fn pdf(&self,x:&Self::T)->Float{
+            match self{
+                Distributions::Normal=>0.3989*f64::powf(consts::E,-0.5*x[0]*x[0]),
+                Distributions::Uniform=>{
+                    if x[0]>=-2.0 && x[0]<=2.0{
+                0.25
+            }
+            else{
+                0.0
+            }}
+            } 
+        }
+    }
+  
+
+    let q=[Distributions::Normal, Distributions::Uniform]; //HIER SIND PROBLEME
+
+
+    //Function to evaluate which is proportional to a valid pdf
+     let f=|s:&[Float]|->Float
+    {
+        f64::powf(consts::E,-0.5*s[0]*s[0])
+    };   
+
+    let x=core::samplers::MetropolisHastings::new(f,Distributions::Normal,Distributions::Normal);
+    x.sample(1);
+    //println!("Result: {:?}",x);
 
 }

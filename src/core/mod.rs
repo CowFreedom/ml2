@@ -23,3 +23,4 @@ pub trait PDF: Distribution
     {
     fn pdf(&self,x:&Self::T)->Float;
 }
+

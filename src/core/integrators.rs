@@ -8,7 +8,6 @@ extern crate crossbeam;
 #[doc = "Numerically evaluate the value of an integral using user-defined probability distributions. Is guaranteed to work asymptotically,
 if the distributions' support equals the integration domain."]
 #[allow(non_snake_case)]
-#[inline]
 pub fn MultipleImportanceSampling<D,F>(dist:&[D],n:&[usize], f:&F)-> Float
     where 
     D:Distribution<T=Float>+PDF+Sync,

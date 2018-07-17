@@ -6,7 +6,7 @@ type Float=f64;
 type Float=f32;
 
 pub mod core;
-
+//pub mod tests;
 
 #[cfg(test)]
     mod tests;

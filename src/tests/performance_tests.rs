@@ -46,23 +46,29 @@ pub fn ProfileSamplers(){
     let q=[Distributions::Normal, Distributions::Uniform];
 
     //Number of samples per sample distribution
-    let k=1_000_000;
+    let k=1_000_000_000;
     let n=[k,k];
 
     //Function to evaluate: s: sample, d:destination
      let f=|s:Float|->Float
     {
-        f64::powf(consts::E,-1.0*s*s)
+        //f64::powf(consts::E,-1.0*s*s)
+        if s<2.0 && s >-2.0{
+            f64::powf(consts::E,s*s*s*s)
+        }
+        else{
+            0.0
+        }
     };
 
-    /*let start1 =  std::time::Instant::now();
+    let start1 =  std::time::Instant::now();
         let res1=core::integrators::MultipleImportanceSamplingSingleCore(&q,&n,&f);
-    let timeSingleCore = start1.elapsed().as_secs();*/
+    let timeSingleCore = start1.elapsed().as_secs();
         let start2 =std::time::Instant::now(); 
      let res2=core::integrators::MultipleImportanceSampling(&q,&n,&f);       
     let timeMultiCore = start2.elapsed().as_secs();
-        println!("MultiCore: {:?}",timeMultiCore);
-        //println!("res1:{}, res2:{}",res1,res2);
+        println!("SingleCore: {:?}\nMultiCore: {:?}",timeSingleCore,timeMultiCore);
+        println!("res1:{}, res2:{}",res1,res2);
 
 
 
