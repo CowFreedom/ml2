@@ -9,7 +9,7 @@ authors = ["Tristan S <tristan.scheidemann@live.com>"]
 nalgebra="0.14.0"
 rand="0.5"
 crossbeam="0.3"
-
+num_cpus = "0.2"
 
 [profile.dev]
 opt-level = 0

@@ -177,7 +177,7 @@ pub fn MetropolisSampling(){
         {
         fn cpdf(&self,x:&Self::T, x_prev:&Self::T)->Float{
             match self.variants{
-                Distributions::Normal=>0.3989*f64::powf(consts::E,-0.5*x_prev[0]*x_prev[0]),
+                Distributions::Normal=>f64::exp(-0.5*0.25*(x[0]-x_prev[0])*(x[0]-x_prev[0])),
             } 
         }
    }
@@ -185,7 +185,7 @@ pub fn MetropolisSampling(){
     //Function to evaluate which is proportional to a valid pdf
      let f=|s:&[Float]|->Float
     {
-        f64::exp(-0.5*f64::powf(s[0]-1.0,2.0))
+        f64::exp(-0.5*f64::powf(s[0]-2.0,2.0))
 
        // f64::powf(consts::E,-0.5*(s[0]*s[0]-1.0))
     };   
@@ -196,9 +196,9 @@ pub fn MetropolisSampling(){
 
     let x=core::samplers::MetropolisHastings::new(f,proposal,x0);
     let n=1000;
-    x.sample(n);
+    //x.sample(n);
     //let y:Vec<Float>=x.sample(n).into_iter().map(|x| x.iter().fold(0.0,|sum, y| *y) ).collect();
-
-    //println!("y expectation: {:?}",y.iter().fold(0.0,|sum,x| sum+x/(n as Float)));
+    let y:Vec<Float>=x.sample(n).into_iter().collect();
+    println!("y expectation: {:?}",y.iter().fold(0.0,|sum,x| sum+x/(n as Float)));
 
 }

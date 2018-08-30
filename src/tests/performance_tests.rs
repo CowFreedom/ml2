@@ -3,7 +3,7 @@ use self::rand::{FromEntropy, Rng};
 use self::rand::distributions::{Uniform,StandardNormal};
 use self::rand::rngs::{SmallRng};
 use Float;
-use ::core::{Distribution, PDF};
+use ::core::{Distribution, PDF, ConditionalDistribution,ConditionalPDF};
 use ::core;
 use std::f64::consts;
 
@@ -14,7 +14,7 @@ use std;
 
 //#[cfg(test)]
 
-pub fn ProfileSamplers(){
+pub fn ProfileImportanceSampling(){
         enum Distributions {
         Normal,
         Uniform
@@ -62,15 +62,83 @@ pub fn ProfileSamplers(){
     };
 
     let start1 =  std::time::Instant::now();
-        let res1=core::integrators::MultipleImportanceSamplingSingleCore(&q,&n,&f);
+    let res1=core::integrators::MultipleImportanceSamplingSingleCore(&q,&n,&f);
     let timeSingleCore = start1.elapsed().as_secs();
-        let start2 =std::time::Instant::now(); 
-     let res2=core::integrators::MultipleImportanceSampling(&q,&n,&f);       
+    let start2 =std::time::Instant::now(); 
+    let res2=core::integrators::MultipleImportanceSampling(&q,&n,&f);       
     let timeMultiCore = start2.elapsed().as_secs();
-        println!("SingleCore: {:?}\nMultiCore: {:?}",timeSingleCore,timeMultiCore);
-        println!("res1:{}, res2:{}",res1,res2);
+    println!("SingleCore: {:?}\nMultiCore: {:?}",timeSingleCore,timeMultiCore);
+    println!("res1:{}, res2:{}",res1,res2);
 
 
 
 }
 
+
+pub fn ProfileMetropolisSampling(){
+
+    enum Distributions {
+        Normal
+    }
+    struct ConditionalDistributions{
+
+        variants:Distributions,
+        //_marker: PhantomData<&'a()>,
+    }
+
+    impl ConditionalDistributions{
+        fn new(dim:usize, var:Distributions)->ConditionalDistributions{
+            ConditionalDistributions{ 
+                variants:var,
+                //_marker: PhantomData::<&'a()>
+            }
+        }
+    }
+
+    impl ConditionalDistribution for ConditionalDistributions
+        //where U:Index<usize, Output=f64>
+        {
+        type T=[Float;1];
+        #[inline]
+        fn csample<R:Rng+?Sized>(&self, rng:&mut R,x_prev:&Self::T)->Self::T
+
+        {
+            match self.variants
+            {
+                Distributions::Normal=>[2.0*SmallRng::from_entropy().sample(StandardNormal)+x_prev[0]],
+            } 
+        }
+    }
+   impl ConditionalPDF for ConditionalDistributions
+        //where U:Index<usize, Output=f64>
+        {
+        #[inline]
+        fn cpdf(&self,x:&Self::T, x_prev:&Self::T)->Float{
+            match self.variants{
+                Distributions::Normal=>f64::exp(-0.5*0.25*(x[0]-x_prev[0])*(x[0]-x_prev[0])),
+            } 
+        }
+   }
+
+    //Function to evaluate which is proportional to a valid pdf
+     let f=|s:&[Float]|->Float
+    {
+        f64::exp(-0.5*f64::powf(s[0]-2.0,2.0))
+
+       // f64::powf(consts::E,-0.5*(s[0]*s[0]-1.0))
+    };   
+
+    let proposal=ConditionalDistributions::new(1,Distributions::Normal);
+
+    let mut x0=[0.0];
+    
+    let x=core::samplers::MetropolisHastings::new(f,proposal,x0);
+    let n=1_00_000_000;
+
+    let start1 =  std::time::Instant::now();
+    let res1=x.sample(n);
+    let time1 = start1.elapsed();
+    println!("Time taken: {:?}",time1);
+   // println!("res1:{:?}",res1);
+
+}
