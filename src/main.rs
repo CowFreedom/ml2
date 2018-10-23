@@ -1,6 +1,6 @@
 extern crate ml2;
 extern crate nalgebra as na;
-use na::{U2, U3, Dynamic, MatrixArray, MatrixVec,SVD};
+use na::{U2, U3, Dynamic, MatrixArray, MatrixVec, SVD};
 use na::Real;
 use std::f64::consts;
 
@@ -8,10 +8,10 @@ use std::f64::consts;
 
 
 
-fn main(){
+fn main() {
 
-   // ml2::tests::performance_tests::ProfileImportanceSampling();
-   ml2::tests::performance_tests::ProfileMetropolisSampling();
+    //ml2::tests::performance_tests::ProfileImportanceSampling();
+    ml2::tests::performance_tests::ProfileMetropolisSampling();
 
 }
 
